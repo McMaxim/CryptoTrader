@@ -46,7 +46,8 @@ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 | Слева вверху всегда переход на рейтинг | Кнопка-кубок в левом верхнем углу на всех экранах. Если рейтинг уже открыт в стеке, кнопка возвращает к нему, а не открывает копию |
 | Профиль с аватаркой, изменения видны в рейтинге | Имя и фото (PhotosPicker) сохраняются в SwiftData и сразу появляются в рейтинге через поток обновлений |
 | Таббара нет, переходы через навигацию | Один `NavigationStack` с путём в роутере |
-| Мост UIKit ↔ SwiftUI | `UIViewRepresentable` для стакана (`UICollectionView`) и для графика (`WKWebView`) |
+| UITableView | Список рейтинга трейдеров — `UITableView` с diffable data source, своими UIKit-ячейками и pull-to-refresh |
+| Мост UIKit ↔ SwiftUI | `UIViewRepresentable` для стакана (`UICollectionView`), рейтинга (`UITableView`) и графика (`WKWebView`) |
 | База данных — SwiftData | Профиль, баланс, позиции и история сделок. UserDefaults не используется: всё лежит в одной базе |
 | Свой сервер не нужен, обмен данными — через публичный API | Binance REST API без ключа. Рейтинг других трейдеров — заглушка «сервера» за протоколом |
 | Демо-счёт: сделка фиксирует текущую цену | Стартовый баланс $10,000. Покупка исполняется по лучшей цене продавца (best ask), продажа — по лучшей цене покупателя (best bid) из текущего стакана |
@@ -63,7 +64,7 @@ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 │  View<VM: Protocol>  ──знает только──▶  ViewModelProtocol  ◀── ViewModel        │
 │  (CoinListView, CoinDetailView, …)                         (@Observable,        │
 │                                                              @MainActor)        │
-│  OrderBookView (UICollectionView) и WKWebView ── через UIViewRepresentable      │
+│  Стакан (UICollectionView), рейтинг (UITableView), WKWebView — UIViewRepresentable │
 └──────────────────────────────────────┬──────────────────────────────────────────┘
                                        │ зависит от протоколов
 ┌──────────────────────────────── Domain ──────────────────────────────────────────┐
@@ -153,7 +154,9 @@ CryptoTraderTests/  юнит-тесты (Swift Testing)
 
 | Что | Чем реализовано | Где |
 |---|---|---|
-| Экран | SwiftUI `List`: «Ваше место» закреплено сверху, своя строка подсвечена в общем списке, медали для топ-3 | `Presentation/Leaderboard/LeaderboardView.swift` |
+| Экран | SwiftUI-обёртка: загрузка и ошибка на SwiftUI, сам список — UIKit | `Presentation/Leaderboard/LeaderboardView.swift` |
+| Список | **UIKit `UITableView`** (`.insetGrouped`) + `UITableViewDiffableDataSource`: «Ваше место» закреплено сверху, своя строка подсвечена в общем списке, медали для топ-3. Изменения имени, аватара и P&L применяются через `reconfigureItems`, обновление — `UIRefreshControl` | `Presentation/Leaderboard/LeaderboardTableView.swift`, `LeaderboardCell.swift` |
+| Аватары | Одна палитра градиентов для SwiftUI `AvatarView` и UIKit `AvatarUIView`, чтобы пользователь выглядел одинаково на всех экранах | `Presentation/Common/AvatarPalette.swift`, `AvatarUIView.swift` |
 | Сбор рейтинга | `LeaderboardService`: параллельно (`async let`) загружает трейдеров, профиль и портфель, оценивает портфель по текущим ценам и сортирует по доходности | `Domain/Services/LeaderboardService.swift` |
 | Другие трейдеры | `MockLeaderboardRepository` — заглушка сервера с задержкой 300 мс. Для настоящего бэкенда достаточно другой реализации `LeaderboardRepositoryProtocol` | `Data/Leaderboard/MockLeaderboardRepository.swift` |
 | Оценка портфеля | `PortfolioValuationService`: `GET /api/v3/ticker/price?symbols=[...]`. Без сети позиции оцениваются по цене покупки с пометкой | `Domain/Services/PortfolioValuationService.swift` |

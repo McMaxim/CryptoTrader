@@ -44,15 +44,8 @@ struct AvatarView: View {
         }
     }
 
-    private static let palettes: [[Color]] = [
-        [.orange, .pink], [.blue, .purple], [.teal, .blue], [.green, .teal],
-        [.indigo, .pink], [.purple, .orange], [.mint, .cyan],
-    ]
-
-    /// Стабильный цвет для строки (hashValue меняется между запусками, поэтому считаем сами).
     private static func gradient(seed: String) -> LinearGradient {
-        let index = seed.unicodeScalars.reduce(0) { $0 &+ Int($1.value) } % palettes.count
-        return LinearGradient(colors: palettes[index], startPoint: .topLeading, endPoint: .bottomTrailing)
+        LinearGradient(colors: AvatarPalette.colors(seed: seed), startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 }
 
