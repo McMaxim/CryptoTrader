@@ -2,6 +2,8 @@
 
 Демо-приложение для торговли криптовалютой на iOS. Пользователь видит рынок, открывает стакан монеты, покупает и продаёт на демо-счёте, смотрит график TradingView и соревнуется с другими трейдерами в рейтинге.
 
+Презентация проекта: [PDF](docs/presentation/CryptoTrader-presentation.pdf) · [HTML](docs/presentation/CryptoTrader-presentation.html) (открывается в браузере, кнопка «▶ Показать» — полноэкранный показ).
+
 | Рынок | Стакан | График | Рейтинг | Профиль |
 |---|---|---|---|---|
 | ![](docs/screenshots/1-market.png) | ![](docs/screenshots/2-orderbook.png) | ![](docs/screenshots/3-chart.png) | ![](docs/screenshots/4-leaderboard.png) | ![](docs/screenshots/5-profile.png) |
